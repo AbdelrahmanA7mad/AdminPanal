@@ -1,0 +1,110 @@
+﻿@using AdminPanal.ViewModel
+@model IEnumerable<ViewModelOfIdnex>
+@{
+    // Calculate total number of products and categories
+    int totalProducts = Model.Sum(category => category.Products.Count());
+    int totalCategories = Model.Count();
+}
+
+<div class="main-content">
+
+    <div class="content">
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-box"></i></div>
+                <div class="card-info">
+                    <h3>Total Products</h3>
+                    <p>@totalProducts</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-tags"></i></div>
+                <div class="card-info">
+                    <h3>Categories</h3>
+                    <p>@totalCategories</p>
+                </div>
+            </div>
+        </div>
+        @if (!Model.Any())
+        {
+            <div class="alert alert-warning mt-5">
+                <h4 class="alert-heading">No categories or products!</h4>
+                <p class="mb-0">No categories or products were added yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="mt-5">
+                @foreach (var category in Model)
+                {
+                    <div class="d-flex align-items-center mb-2">
+                        <!-- Category Button -->
+                        <button class="btn btn-outline-dark flex-grow-1 me-2 btn-primary text-white" data-bs-toggle="collapse" data-bs-target="#products-@category.Name.Replace(" ", "-")">
+                            <h2>
+                                @category.Name
+                            </h2>
+                        </button>
+
+                        <!-- Edit and Delete Buttons -->
+                        <a class="btn btn-info me-2" asp-action="UpdateCategory" asp-route-id="@category.Id">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="javascript:;" class="btn btn-danger rounded rounded-3 js-delete" data-id="@category.Id">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </div>
+                    <!-- Collapsible Products Section -->
+                    <div class="collapse" id="products-@category.Name.Replace(" ", "-")">
+                        <table class="table table-bordered border-primary mt-3">
+                            <tbody>
+                                @if (!category.Products.Any())
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">No products available in this category.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var product in category.Products)
+                                    {
+                                        <tr class="border-1 border-dark">
+                                            <td>
+                                                <div class="d-flex">
+                                                    <div class="pe-4">
+                                                        <img src="@($"{Settings.ImagePath}/{product.Image_Url}")" alt="@product.product_Name" class="img-thumbnail" style="width: 90px; height: 90px; object-fit: cover;" />
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h4 class="text-dark">@product.product_Name</h4>
+                                                        <p class="text-dark">@product.Description</p>
+                                                        <h5 class="text-dark">@product.Price.ToString("C")</h5>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex justify-content-end">
+                                                    <a class="btn btn-info rounded rounded-3 me-2" asp-action="UpdateProduct" asp-route-id="@product.Id">
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </a>
+                                                    <a href="javascript:;" class="btn btn-danger rounded rounded-3 js-delete" data-id="@product.Id">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+
+       
+    </div>
+</div>
+        @section Scripts
+        {
+            
+            <script src="~/js/delete.js" asp-append-version="true"></script>
+        }
